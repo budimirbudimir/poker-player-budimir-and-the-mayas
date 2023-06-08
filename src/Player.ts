@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 interface Card {
   rank: string;
   suit: string;
@@ -28,6 +29,10 @@ interface Game {
   players: GamePlayer[];
   community_cards: Card[];
 }
+=======
+import { uniq } from 'lodash'
+
+>>>>>>> 668e863 (feat: add all suits)
 const getAllCards = (gameState) => {
   const myHoleCards = gameState.players.filter(p => {
     if (p.hole_cards) return p.hole_cards
@@ -44,6 +49,12 @@ const shouldRaiseBasedOnSuit = (allCards) => {
   const hasFourOfSameSuit = hearts.length > 3 || spades.length > 3 || diamonds.length > 3 || clubs.length > 3
 
   return hasFourOfSameSuit
+}
+
+const getPairsFromAllCards = (allCards) => {
+  allCards.find(c => {
+    c.rank === ''
+  })
 }
 
 
