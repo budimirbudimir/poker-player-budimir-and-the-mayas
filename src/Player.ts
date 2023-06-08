@@ -81,7 +81,7 @@ const getAllOccurrences = (allCards) => {
 const getAllPairs = (occurrences) => {
   const pairs = [];
   for (const [key, value] of Object.entries(occurrences)) {
-    if (value > 1) pairs.push(key);
+    if ((value as number) > 1) pairs.push(key);
   }
   return pairs;
 };
@@ -102,11 +102,20 @@ export class Player {
     }
 
     const allCards = getAllCards(gameState);
+    if (allCards.length === 2) {
+      this.betStarting(holeCards, callAmt, minRaise, betCallback);
+      return;
+    }
     const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
     const allOccurrences = getAllOccurrences(allCards);
     const allPairs = getAllPairs(allOccurrences);
+    if (allCards.length === 5) {
+      if (allOccurrences)
+    } else if (allCards.length === 6) {
+    } else if (allCards.length === 7) {
+    }
 
-    this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    // this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
 
   private betStarting(
