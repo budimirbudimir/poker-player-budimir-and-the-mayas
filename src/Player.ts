@@ -91,6 +91,52 @@ const getPairs = (occurrences) => {
   return { pairs, triplets, quadruplets };
 };
 
+function detectLargeBet(players: GamePlayer[]) {
+  const opponent = players.find((p) => p.name === "Monks on Meth");
+  const myPlayer = players.find((p) => p.name === "Budimir and The Mayas");
+  const oppBet = opponent.bet;
+  const currBet = myPlayer.bet;
+  const oppStack = opponent.stack;
+  const betDiff = oppBet - currBet;
+  const betRatio = oppBet / currBet;
+  if (oppStack < 20 && betDiff > 200) {
+    return true;
+  }
+  if (betRatio >= 5 && betDiff > 100) {
+    return true;
+  }
+}
+
+const getStraight = (occurrences) => {
+  const arrayToInspect = Object.values(occurrences)
+  const arrayOfBools = arrayToInspect.map(item => Boolean(item))
+  let isStraight = false;
+
+  arrayOfBools.reduce((acc, current, index) => {
+    // If already detected straight, just return 5
+    if (acc === 5) {
+      return 5
+    }
+    // If just forming straight, return 5
+    if (acc === 4 && current === true) {
+      isStraight = true;
+      return 5 // We have it!
+    }
+    // If accumulator is in default/reset state, increase
+    if (acc === 0 && current === true) {
+      return 1
+    }
+    if (acc > 0 && current === true) {
+      return acc + 1
+    }
+    if (acc > 0 || current === false) {
+      return 0
+    }
+  }, 0)
+
+  return isStraight
+}
+
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
@@ -100,7 +146,9 @@ export class Player {
     const callAmt = currentBuyin - currentBet;
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
-    const currPot = gameState.pot;
+    // const currPot = gameState.pot;
+
+    const hasLargeBet = detectLargeBet(players);
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
@@ -112,18 +160,18 @@ export class Player {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
-
+    
     const sameFourSuit = shouldRaiseBasedOnSuit(allCards, 4);
     const flush = shouldRaiseBasedOnSuit(allCards, 5);
-    
     const allOccurrences = getAllOccurrences(allCards);
     const { pairs, triplets, quadruplets } = getPairs(allOccurrences);
     const hasPair = pairs.length === 1;
-    const hasTwoPairs = pairs.length === 2;
+    // const hasTwoPairs = pairs.length === 2;
     const hasThreeOfAKind = triplets.length > 0;
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
-
+    const hasStraight = getStraight(allOccurrences)
+    
     if (allCards.length === 5) {
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 3));
@@ -131,6 +179,7 @@ export class Player {
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 2.5));
+        return;
       }
       if (sameFourSuit) {
         betCallback(Math.ceil(callAmt + minRaise * 2.5));
@@ -150,6 +199,7 @@ export class Player {
     } else if (allCards.length === 7) {
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 4));
+        return;
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 3.5));
@@ -157,7 +207,12 @@ export class Player {
       }
     }
 
-    // this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    if (hasLargeBet) {
+      betCallback(0);
+      return;
+    }
+
+    betCallback(callAmt);
   }
 
   private betStarting(
