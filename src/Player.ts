@@ -116,7 +116,7 @@ export class Player {
     const callAmt = currentBuyin - currentBet;
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
-    const currPot = gameState.pot;
+    // const currPot = gameState.pot;
 
     if (detectLargeBet(players)) {
       betCallback(0);
@@ -133,11 +133,11 @@ export class Player {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
-    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
+    // const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
     const allOccurrences = getAllOccurrences(allCards);
     const { pairs, triplets, quadruplets } = getPairs(allOccurrences);
     const hasPair = pairs.length === 1;
-    const hasTwoPairs = pairs.length === 2;
+    // const hasTwoPairs = pairs.length === 2;
     const hasThreeOfAKind = triplets.length > 0;
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
@@ -148,6 +148,7 @@ export class Player {
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 2.5));
+        return;
       }
     } else if (allCards.length === 6) {
       if (hasFourOfAKind) {
@@ -161,6 +162,7 @@ export class Player {
     } else if (allCards.length === 7) {
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 4));
+        return;
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 3.5));
@@ -168,7 +170,7 @@ export class Player {
       }
     }
 
-    // this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
 
   private betStarting(
