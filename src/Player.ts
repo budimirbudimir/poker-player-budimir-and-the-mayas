@@ -28,6 +28,44 @@ interface Game {
   players: GamePlayer[];
   community_cards: Card[];
 }
+const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+const suits = ['hearts', 'spades', 'diamonds', 'clubs']
+
+const getAllCards = (gameState) => {
+  const myHoleCards = gameState.players.filter(p => {
+    if (p.hole_cards) return p.hole_cards
+  })
+  return [...gameState.community_cards, ...myHoleCards]
+}
+
+const shouldRaiseBasedOnSuit = (allCards) => {
+  const hearts = allCards.filter(c => c.suit === 'hearts')
+  const spades = allCards.filter(c => c.suit === 'spades')
+  const diamonds = allCards.filter(c => c.suit === 'diamonds')
+  const clubs = allCards.filter(c => c.suit === 'clubs')
+
+  const hasFourOfSameSuit = hearts.length > 3 || spades.length > 3 || diamonds.length > 3 || clubs.length > 3
+
+  return hasFourOfSameSuit
+}
+
+const getAllOccurrences = (allCards) => {
+  const allRanks = allCards.map(c => c.rank)
+
+  const occurrences: Record<string, number> = ranks.reduce((acc, r) => {
+    return { ...acc, [r]: allRanks.filter(ar => ar === r).length }
+  }, {})
+
+  return occurrences
+}
+
+const getAllPairs = (occurrences) => {
+  const pairs = []
+  for (const [key, value] of Object.entries(occurrences)) {
+    if (value > 1) pairs.push(key)
+  }
+  return pairs
+}
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -39,9 +77,12 @@ export class Player {
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
 
-    this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    const allCards = getAllCards(gameState)
+    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
+    const allOccurrences = getAllOccurrences(allCards)
+    const allPairs = getAllPairs(allOccurrences)
 
-    betCallback(callAmt);
+    this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
 
   private betStarting(
@@ -72,33 +113,43 @@ export class Player {
           break;
         default:
           betCallback(callAmt + minRaise);
+          break;
       }
-    } else if (firstCard.suit === secondCard.suit) {
+      return;
+    }
+    if (firstCard.suit === secondCard.suit) {
       if (firstCard.rank === "A" || secondCard.rank === "A") {
         if (firstCard.rank === "K" || secondCard.rank === "K") {
           //A+K suited
           betCallback(callAmt + minRaise * 4);
+          return;
         }
         if (firstCard.rank === "Q" || secondCard.rank === "Q") {
           // A+Q suited
           betCallback(callAmt + minRaise * 3);
+          return;
         }
         if (firstCard.rank === "J" || secondCard.rank === "J") {
           // A+J suited
           betCallback(callAmt + minRaise * 3);
+          return;
         }
       }
-    } else if (firstCard.rank === "K" || secondCard.rank === "K") {
+    }
+    if (firstCard.rank === "K" || secondCard.rank === "K") {
       if (firstCard.rank === "Q" || secondCard.rank === "Q") {
         // K+Q suited
         betCallback(callAmt + minRaise * 3);
+        return;
       }
-    } else if (
-      (firstCard.rank === "A" || firstCard.rank === "K") &&
-      (secondCard.rank === "A" || secondCard.rank === "K")
-    ) {
-      betCallback(callAmt + minRaise * 2);
-    } else if (this.shouldFold(firstCard, secondCard)) {
+    }
+    if (firstCard.rank === "A" || secondCard.rank === "A") {
+      if (firstCard.rank === "K" || secondCard.rank === "K") {
+        betCallback(callAmt + minRaise * 2);
+        return;
+      }
+    }
+    if (this.shouldFold(firstCard, secondCard)) {
       betCallback(0);
     } else {
       betCallback(callAmt);
