@@ -137,6 +137,16 @@ const getStraight = (occurrences) => {
   return isStraight;
 };
 
+const isFromTenToAce = (occurrences) => {
+  // 1. trim last 5
+  const lastFive = occurrences.split(
+    occurrences.length + 1,
+    occurrences.length - 4
+  );
+  // 2. check if all are true
+  return !lastFive.find((o) => o === false);
+};
+
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
@@ -149,6 +159,11 @@ export class Player {
     // const currPot = gameState.pot;
 
     const hasLargeBet = detectLargeBet(players);
+
+    if (Math.random() > 0.95) {
+      betCallback(callAmt + minRaise * 10);
+      return;
+    }
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
@@ -172,9 +187,15 @@ export class Player {
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
     const hasStraight = getStraight(allOccurrences);
+    const hasStraightFlush = hasFlush && hasStraight;
+    const hasFlushRoyal = hasStraightFlush && isFromTenToAce(allOccurrences);
 
     if (allCards.length === 5) {
-      if (hasStraight && hasFlush) {
+      if (hasFlushRoyal) {
+        betCallback(Math.ceil(callAmt + minRaise * 5));
+        return;
+      }
+      if (hasStraightFlush) {
         betCallback(Math.ceil(callAmt + minRaise * 4));
         return;
       }
@@ -211,7 +232,11 @@ export class Player {
         return;
       }
     } else if (allCards.length === 6) {
-      if (hasStraight && hasFlush) {
+      if (hasFlushRoyal) {
+        betCallback(Math.ceil(callAmt + minRaise * 5.5));
+        return;
+      }
+      if (hasStraightFlush) {
         betCallback(Math.ceil(callAmt + minRaise * 4.5));
         return;
       }
@@ -244,7 +269,11 @@ export class Player {
         return;
       }
     } else if (allCards.length === 7) {
-      if (hasStraight && hasFlush) {
+      if (hasFlushRoyal) {
+        betCallback(Math.ceil(callAmt + minRaise * 6));
+        return;
+      }
+      if (hasStraightFlush) {
         betCallback(Math.ceil(callAmt + minRaise * 5));
         return;
       }
