@@ -40,6 +40,8 @@ export class Player {
     const holeCards = gameState.players[playerIndex]["hole_cards"];
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
+
+    betCallback(callAmt);
   }
 
   private betStarting(
