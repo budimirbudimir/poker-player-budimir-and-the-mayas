@@ -127,6 +127,7 @@ export class Player {
 
     if (detectLargeBet(players, playerIndex)) {
       betCallback(0);
+      return;
     }
 
     if (currentBet === 0) {
