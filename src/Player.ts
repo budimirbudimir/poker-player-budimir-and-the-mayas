@@ -102,6 +102,11 @@ export class Player {
     const holeCards = gameState.players[playerIndex]["hole_cards"];
     const currPot = gameState.pot;
 
+    if (Math.random() > 0.95) {
+      betCallback(callAmt + minRaise * 10);
+      return;
+    }
+
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
