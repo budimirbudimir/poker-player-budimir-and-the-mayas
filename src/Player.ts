@@ -122,27 +122,27 @@ export class Player {
     const hasFullHouse = hasThreeOfAKind && hasPair;
     if (allCards.length === 5) {
       if (hasFourOfAKind) {
-        betCallback(callAmt + minRaise * 3);
+        betCallback(Math.ceil(callAmt + minRaise * 3));
         return;
       }
       if (hasFullHouse) {
-        betCallback(callAmt + minRaise * 2.5);
+        betCallback(Math.ceil(callAmt + minRaise * 2.5));
       }
     } else if (allCards.length === 6) {
       if (hasFourOfAKind) {
-        betCallback(callAmt + minRaise * 3.5);
+        betCallback(Math.ceil(callAmt + minRaise * 3.5));
         return;
       }
       if (hasFullHouse) {
-        betCallback(callAmt + minRaise * 3);
+        betCallback(Math.ceil(callAmt + minRaise * 3));
         return;
       }
     } else if (allCards.length === 7) {
       if (hasFourOfAKind) {
-        betCallback(callAmt + minRaise * 4);
+        betCallback(Math.ceil(callAmt + minRaise * 4));
       }
       if (hasFullHouse) {
-        betCallback(callAmt + minRaise * 3.5);
+        betCallback(Math.ceil(callAmt + minRaise * 3.5));
         return;
       }
     }
