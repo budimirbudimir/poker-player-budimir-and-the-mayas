@@ -69,9 +69,31 @@ export class Player {
         (secondCard.rank === "A" || secondCard.rank === "K"):
         betCallback(callAmt);
         break;
+      case this.shouldFold(firstCard, secondCard):
+        betCallback(0);
+        break;
       default:
         betCallback(callAmt);
     }
+  }
+
+  shouldFold = (firstCard: any, secondCard: any): boolean => {
+    const ranks = [+firstCard.rank, +secondCard.rank].sort()
+    
+    if (ranks[0] === 2 && ranks[1] === 6) return true
+    if (ranks[0] === 2 && ranks[1] === 7) return true
+    if (ranks[0] === 2 && ranks[1] === 8) return true
+    if (ranks[0] === 2 && ranks[1] === 9) return true
+    if (ranks[0] === 2 && ranks[1] === 10) return true
+  
+    if (ranks[0] === 3 && ranks[1] === 7) return true
+    if (ranks[0] === 3 && ranks[1] === 9) return true
+  
+    if (ranks[0] === 4 && ranks[1] === 7) return true
+    if (ranks[0] === 4 && ranks[1] === 8) return true
+    if (ranks[0] === 4 && ranks[1] === 9) return true
+  
+    return false
   }
 
   public showdown(gameState: any): void {}
