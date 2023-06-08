@@ -40,8 +40,6 @@ export class Player {
     const holeCards = gameState.players[playerIndex]["hole_cards"];
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
-
-    betCallback(callAmt);
   }
 
   private betStarting(
@@ -72,33 +70,43 @@ export class Player {
           break;
         default:
           betCallback(callAmt + minRaise);
+          break;
       }
-    } else if (firstCard.suit === secondCard.suit) {
+      return;
+    }
+    if (firstCard.suit === secondCard.suit) {
       if (firstCard.rank === "A" || secondCard.rank === "A") {
         if (firstCard.rank === "K" || secondCard.rank === "K") {
           //A+K suited
           betCallback(callAmt + minRaise * 4);
+          return;
         }
         if (firstCard.rank === "Q" || secondCard.rank === "Q") {
           // A+Q suited
           betCallback(callAmt + minRaise * 3);
+          return;
         }
         if (firstCard.rank === "J" || secondCard.rank === "J") {
           // A+J suited
           betCallback(callAmt + minRaise * 3);
+          return;
         }
       }
-    } else if (firstCard.rank === "K" || secondCard.rank === "K") {
+    }
+    if (firstCard.rank === "K" || secondCard.rank === "K") {
       if (firstCard.rank === "Q" || secondCard.rank === "Q") {
         // K+Q suited
         betCallback(callAmt + minRaise * 3);
+        return;
       }
-    } else if (
-      (firstCard.rank === "A" || firstCard.rank === "K") &&
-      (secondCard.rank === "A" || secondCard.rank === "K")
-    ) {
-      betCallback(callAmt + minRaise * 2);
-    } else if (this.shouldFold(firstCard, secondCard)) {
+    }
+    if (firstCard.rank === "A" || secondCard.rank === "A") {
+      if (firstCard.rank === "K" || secondCard.rank === "K") {
+        betCallback(callAmt + minRaise * 2);
+        return;
+      }
+    }
+    if (this.shouldFold(firstCard, secondCard)) {
       betCallback(0);
     } else {
       betCallback(callAmt);
