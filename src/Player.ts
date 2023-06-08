@@ -91,6 +91,29 @@ const getPairs = (occurrences) => {
   return { pairs, triplets, quadruplets };
 };
 
+function detectLargeBet(players: GamePlayer[], playerIndex: number) {
+  let oppStack,
+    oppBet,
+    currBet = 0;
+  if (playerIndex === 0) {
+    oppStack = players[1].stack;
+    oppBet = players[1].bet;
+    currBet = players[0].bet;
+  } else {
+    oppStack = players[0].stack;
+    oppBet = players[0].bet;
+    currBet = players[1].bet;
+  }
+  const betDiff = oppBet - currBet;
+  const betRatio = oppBet / currBet;
+  if (oppStack === 0 && betDiff > 200) {
+    return true;
+  }
+  if (betRatio > 5) {
+    return true;
+  }
+}
+
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
@@ -101,6 +124,11 @@ export class Player {
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
     const currPot = gameState.pot;
+
+    if (detectLargeBet(players, playerIndex)) {
+      betCallback(0);
+      return;
+    }
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
