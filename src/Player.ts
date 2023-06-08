@@ -28,36 +28,55 @@ interface Game {
   players: GamePlayer[];
   community_cards: Card[];
 }
-const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-const suits = ['hearts', 'spades', 'diamonds', 'clubs']
+const ranks = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+  "A",
+];
+const suits = ["hearts", "spades", "diamonds", "clubs"];
 
 const getAllCards = (gameState) => {
-  const myHoleCards = gameState.players.filter(p => {
-    if (p.hole_cards) return p.hole_cards
-  })
-  return [...gameState.community_cards, ...myHoleCards]
-}
+  const myHoleCards = gameState.players.filter((p) => {
+    if (p.hole_cards) return p.hole_cards;
+  });
+  return [...gameState.community_cards, ...myHoleCards];
+};
 
 const shouldRaiseBasedOnSuit = (allCards) => {
-  const hearts = allCards.filter(c => c.suit === 'hearts')
-  const spades = allCards.filter(c => c.suit === 'spades')
-  const diamonds = allCards.filter(c => c.suit === 'diamonds')
-  const clubs = allCards.filter(c => c.suit === 'clubs')
+  const hearts = allCards.filter((c) => c.suit === "hearts");
+  const spades = allCards.filter((c) => c.suit === "spades");
+  const diamonds = allCards.filter((c) => c.suit === "diamonds");
+  const clubs = allCards.filter((c) => c.suit === "clubs");
 
-  const hasFourOfSameSuit = hearts.length > 3 || spades.length > 3 || diamonds.length > 3 || clubs.length > 3
+  const hasFourOfSameSuit =
+    hearts.length > 3 ||
+    spades.length > 3 ||
+    diamonds.length > 3 ||
+    clubs.length > 3;
 
-  return hasFourOfSameSuit
-}
+  return hasFourOfSameSuit;
+};
 
 const getAllOccurrences = (allCards) => {
-  const allRanks = allCards.map(c => c.rank)
+  const allRanks = allCards.map((c) => c.rank);
 
   const occurrences: Record<string, number> = ranks.reduce((acc, r) => {
-    return { ...acc, [r]: allRanks.filter(ar => ar === r).length }
-  }, {})
+    return { ...acc, [r]: allRanks.filter((ar) => ar === r).length };
+  }, {});
 
-  return occurrences
-}
+  return occurrences;
+};
 
 const getPairs = (occurrences) => {
   const pairs = []
@@ -82,6 +101,11 @@ export class Player {
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
 
+    if (currentBet === 0) {
+      this.betStarting(holeCards, callAmt, minRaise, betCallback);
+      return;
+    }
+    
     const allCards = getAllCards(gameState)
     const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
     const allOccurrences = getAllOccurrences(allCards)
