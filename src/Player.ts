@@ -160,10 +160,10 @@ export class Player {
 
     const hasLargeBet = detectLargeBet(players);
 
-    if (Math.random() > 0.95) {
-      betCallback(callAmt + minRaise * 10);
-      return;
-    }
+    // if (Math.random() > 0.95) {
+    //   betCallback(callAmt + minRaise * 10);
+    //   return;
+    // }
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
