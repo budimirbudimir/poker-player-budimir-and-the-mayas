@@ -91,7 +91,7 @@ const getPairs = (occurrences) => {
   return { pairs, triplets, quadruplets };
 };
 
-function detectLargeBet(players: GamePlayer[], playerIndex: number) {
+function detectLargeBet(players: GamePlayer[]) {
   const opponent = players.find((p) => p.name === "Monks on Meth");
   const myPlayer = players.find((p) => p.name === "Budimir and The Mayas");
   const oppBet = opponent.bet;
@@ -118,7 +118,7 @@ export class Player {
     const holeCards = gameState.players[playerIndex]["hole_cards"];
     const currPot = gameState.pot;
 
-    if (detectLargeBet(players, playerIndex)) {
+    if (detectLargeBet(players)) {
       betCallback(0);
       return;
     }
