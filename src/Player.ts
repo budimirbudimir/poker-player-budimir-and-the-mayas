@@ -59,28 +59,17 @@ const getAllOccurrences = (allCards) => {
   return occurrences
 }
 
-const getAllTwoOfAKind = (occurrences) => {
+const getPairs = (occurrences) => {
   const pairs = []
+  const triplets = []
+  const quadruplets = []
+
   for (const [key, value] of Object.entries(occurrences)) {
     if (value > 1) pairs.push(key)
-  }
-  return pairs
-}
-
-const getAllThreeOfAKind = (occurrences) => {
-  const triplets = []
-  for (const [key, value] of Object.entries(occurrences)) {
     if (value > 2) triplets.push(key)
-  }
-  return triplets
-}
-
-const getAllFourOfAKind = (occurrences) => {
-  const quadruplets = []
-  for (const [key, value] of Object.entries(occurrences)) {
     if (value > 3) quadruplets.push(key)
   }
-  return quadruplets
+  return { pairs, triplets, quadruplets }
 }
 
 export class Player {
@@ -96,14 +85,12 @@ export class Player {
     const allCards = getAllCards(gameState)
     const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
     const allOccurrences = getAllOccurrences(allCards)
-    const allPairs = getAllTwoOfAKind(allOccurrences)
-    const allThreeOfAKinds = getAllThreeOfAKind(allOccurrences)
-    const allFourOfAKinds = getAllFourOfAKind(allOccurrences)
+    const { pairs, triplets, quadruplets}  = getPairs(allOccurrences)
 
-    const hasPair = allPairs.length === 1
-    const hasTwoPairs = allPairs.length === 2
-    const hasThreeOfAKind = allThreeOfAKinds.length > 0
-    const hasFourOfAKind = allFourOfAKinds.length > 0
+    const hasPair = pairs.length === 1
+    const hasTwoPairs = pairs.length === 2
+    const hasThreeOfAKind = triplets.length > 0
+    const hasFourOfAKind = quadruplets.length > 0
     const hasFullHouse = hasThreeOfAKind && hasPair
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
