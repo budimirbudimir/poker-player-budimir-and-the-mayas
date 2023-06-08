@@ -137,6 +137,13 @@ const getStraight = (occurrences) => {
   return isStraight
 }
 
+const isFromTenToAce = (occurrences) => {
+  // 1. trim last 5
+  const lastFive = occurrences.split(occurrences.length + 1, occurrences.length - 4)
+  // 2. check if all are true
+  return !lastFive.find(o => o === false)
+}
+
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
@@ -171,6 +178,8 @@ export class Player {
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
     const hasStraight = getStraight(allOccurrences)
+    const hasStraightFlush = flush && hasStraight
+    const hasFlushRoyal = hasStraightFlush && isFromTenToAce(allOccurrences)
     
     if (allCards.length === 5) {
       if (hasFourOfAKind) {
