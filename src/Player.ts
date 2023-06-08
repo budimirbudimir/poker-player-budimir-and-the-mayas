@@ -99,7 +99,7 @@ function detectLargeBet(players: GamePlayer[], playerIndex: number) {
   const oppStack = opponent.stack;
   const betDiff = oppBet - currBet;
   const betRatio = oppBet / currBet;
-  if (oppStack === 0 && betDiff > 200) {
+  if (oppStack < 20 && betDiff > 200) {
     return true;
   }
   if (betRatio > 5) {
