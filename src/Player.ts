@@ -28,6 +28,24 @@ interface Game {
   players: GamePlayer[];
   community_cards: Card[];
 }
+const getAllCards = (gameState) => {
+  const myHoleCards = gameState.players.filter(p => {
+    if (p.hole_cards) return p.hole_cards
+  })
+  return [...gameState.community_cards, ...myHoleCards]
+}
+
+const shouldRaiseBasedOnSuit = (allCards) => {
+  const hearts = allCards.filter(c => c.suit === 'hearts')
+  const spades = allCards.filter(c => c.suit === 'spades')
+  const diamonds = allCards.filter(c => c.suit === 'diamonds')
+  const clubs = allCards.filter(c => c.suit === 'clubs')
+
+  const hasFourOfSameSuit = hearts.length > 3 || spades.length > 3 || diamonds.length > 3 || clubs.length > 3
+
+  return hasFourOfSameSuit
+}
+
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -38,6 +56,9 @@ export class Player {
     const callAmt = currentBuyin - currentBet;
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
+
+    const allCards = getAllCards(gameState)
+    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
