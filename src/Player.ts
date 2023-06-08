@@ -387,7 +387,9 @@ export class Player {
   }
 
   shouldFold = (firstCard: Card, secondCard: Card): boolean => {
-    const ranks = [+firstCard.rank, +secondCard.rank].sort((a, b) => a - b);
+    const ranks = [Number(firstCard.rank), Number(secondCard.rank)].sort(
+      (a, b) => a - b
+    );
 
     if (ranks[0] === 2 && ranks[1] === 6) return true;
     if (ranks[0] === 2 && ranks[1] === 7) return true;
@@ -396,6 +398,7 @@ export class Player {
     if (ranks[0] === 2 && ranks[1] === 10) return true;
 
     if (ranks[0] === 3 && ranks[1] === 7) return true;
+    if (ranks[0] === 3 && ranks[1] === 8) return true;
     if (ranks[0] === 3 && ranks[1] === 9) return true;
 
     if (ranks[0] === 4 && ranks[1] === 7) return true;
