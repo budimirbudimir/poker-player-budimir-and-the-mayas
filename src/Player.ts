@@ -114,6 +114,36 @@ function detectLargeBet(players: GamePlayer[], playerIndex: number) {
   }
 }
 
+const getStraight = (occurrences) => {
+  const arrayToInspect = Object.values(occurrences)
+  const arrayOfBools = arrayToInspect.map(item => Boolean(item))
+  let isStraight = false;
+
+  arrayOfBools.reduce((acc, current, index) => {
+    // If already detected straight, just return 5
+    if (acc === 5) {
+      return 5
+    }
+    // If just forming straight, return 5
+    if (acc === 4 && current === true) {
+      isStraight = true;
+      return 5 // We have it!
+    }
+    // If accumulator is in default/reset state, increase
+    if (acc === 0 && current === true) {
+      return 1
+    }
+    if (acc > 0 && current === true) {
+      return acc + 1
+    }
+    if (acc > 0 || current === false) {
+      return 0
+    }
+  }, 0)
+
+  return isStraight
+}
+
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
@@ -148,6 +178,7 @@ export class Player {
     const hasThreeOfAKind = triplets.length > 0;
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
+    const hasStraight = getStraight(allOccurrences)
     if (allCards.length === 5) {
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 3));
