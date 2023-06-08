@@ -53,17 +53,17 @@ const getAllCards = (gameState) => {
   return [...gameState.community_cards, ...myHoleCards];
 };
 
-const shouldRaiseBasedOnSuit = (allCards) => {
+const shouldRaiseBasedOnSuit = (allCards, minimum: number) => {
   const hearts = allCards.filter((c) => c.suit === "hearts");
   const spades = allCards.filter((c) => c.suit === "spades");
   const diamonds = allCards.filter((c) => c.suit === "diamonds");
   const clubs = allCards.filter((c) => c.suit === "clubs");
 
   const hasFourOfSameSuit =
-    hearts.length > 3 ||
-    spades.length > 3 ||
-    diamonds.length > 3 ||
-    clubs.length > 3;
+    hearts.length == minimum ||
+    spades.length == minimum ||
+    diamonds.length == minimum ||
+    clubs.length == minimum;
 
   return hasFourOfSameSuit;
 };
@@ -112,7 +112,10 @@ export class Player {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
-    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
+
+    const sameFourSuit = shouldRaiseBasedOnSuit(allCards, 4);
+    const flush = shouldRaiseBasedOnSuit(allCards, 5);
+    
     const allOccurrences = getAllOccurrences(allCards);
     const { pairs, triplets, quadruplets } = getPairs(allOccurrences);
     const hasPair = pairs.length === 1;
@@ -120,6 +123,7 @@ export class Player {
     const hasThreeOfAKind = triplets.length > 0;
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
+
     if (allCards.length === 5) {
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 3));
@@ -127,6 +131,12 @@ export class Player {
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 2.5));
+      }
+      if (sameFourSuit) {
+        betCallback(Math.ceil(callAmt + minRaise * 2.5));
+      }
+      if (flush) {
+        betCallback(Math.ceil(callAmt + minRaise * 4));
       }
     } else if (allCards.length === 6) {
       if (hasFourOfAKind) {
