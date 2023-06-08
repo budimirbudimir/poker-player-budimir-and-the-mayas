@@ -118,10 +118,7 @@ export class Player {
     const holeCards = gameState.players[playerIndex]["hole_cards"];
     // const currPot = gameState.pot;
 
-    if (detectLargeBet(players)) {
-      betCallback(0);
-      return;
-    }
+    const hasLargeBet = detectLargeBet(players);
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
@@ -170,7 +167,12 @@ export class Player {
       }
     }
 
-    this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    if (hasLargeBet) {
+      betCallback(0);
+      return;
+    }
+
+    betCallback(callAmt);
   }
 
   private betStarting(
