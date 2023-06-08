@@ -65,9 +65,9 @@ const getPairs = (occurrences) => {
   const quadruplets = []
 
   for (const [key, value] of Object.entries(occurrences)) {
-    if (value > 1) pairs.push(key)
-    if (value > 2) triplets.push(key)
-    if (value > 3) quadruplets.push(key)
+    if (value === 2) pairs.push(key)
+    if (value === 3) triplets.push(key)
+    if (value === 4) quadruplets.push(key)
   }
   return { pairs, triplets, quadruplets }
 }
