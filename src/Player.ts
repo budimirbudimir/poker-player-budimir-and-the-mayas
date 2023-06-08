@@ -1,5 +1,36 @@
+interface Card {
+  rank: string;
+  suit: string;
+}
+
+interface GamePlayer {
+  id: number;
+  name: string;
+  status: string;
+  version: string;
+  stack: number;
+  bet: number;
+  hole_cards?: Card[];
+}
+
+interface Game {
+  tournament_id: string;
+  game_id: string;
+  round: number;
+  bet_index: number;
+  small_blind: number;
+  current_buy_in: number;
+  pot: number;
+  minimum_raise: number;
+  dealer: number;
+  orbits: number;
+  in_action: number;
+  players: GamePlayer[];
+  community_cards: Card[];
+}
+
 export class Player {
-  public betRequest(gameState: any, betCallback: (bet: number) => void): void {
+  public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
     const currentBuyin = gameState.current_buy_in;
     const players = gameState.players;
     const playerIndex = gameState.in_action;
@@ -65,12 +96,33 @@ export class Player {
       (secondCard.rank === "A" || secondCard.rank === "K")
     ) {
       betCallback(callAmt + minRaise * 2);
+    } else if (this.shouldFold(firstCard, secondCard)) {
+      betCallback(0);
     } else {
       betCallback(callAmt);
     }
   }
 
-  public showdown(gameState: any): void {}
+  shouldFold = (firstCard: Card, secondCard: Card): boolean => {
+    const ranks = [+firstCard.rank, +secondCard.rank].sort();
+
+    if (ranks[0] === 2 && ranks[1] === 6) return true;
+    if (ranks[0] === 2 && ranks[1] === 7) return true;
+    if (ranks[0] === 2 && ranks[1] === 8) return true;
+    if (ranks[0] === 2 && ranks[1] === 9) return true;
+    if (ranks[0] === 2 && ranks[1] === 10) return true;
+
+    if (ranks[0] === 3 && ranks[1] === 7) return true;
+    if (ranks[0] === 3 && ranks[1] === 9) return true;
+
+    if (ranks[0] === 4 && ranks[1] === 7) return true;
+    if (ranks[0] === 4 && ranks[1] === 8) return true;
+    if (ranks[0] === 4 && ranks[1] === 9) return true;
+
+    return false;
+  };
+
+  public showdown(gameState: Game): void {}
 }
 
 export default Player;
