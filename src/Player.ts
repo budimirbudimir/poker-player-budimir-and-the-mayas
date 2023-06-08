@@ -102,7 +102,7 @@ function detectLargeBet(players: GamePlayer[]) {
   if (oppStack < 20 && betDiff > 200) {
     return true;
   }
-  if (betRatio > 5 && betDiff > 100) {
+  if (betRatio >= 5 && betDiff > 100) {
     return true;
   }
 }
