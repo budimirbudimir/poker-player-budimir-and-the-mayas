@@ -108,34 +108,34 @@ function detectLargeBet(players: GamePlayer[]) {
 }
 
 const getStraight = (occurrences) => {
-  const arrayToInspect = Object.values(occurrences)
-  const arrayOfBools = arrayToInspect.map(item => Boolean(item))
+  const arrayToInspect = Object.values(occurrences);
+  const arrayOfBools = arrayToInspect.map((item) => Boolean(item));
   let isStraight = false;
 
   arrayOfBools.reduce((acc, current, index) => {
     // If already detected straight, just return 5
     if (acc === 5) {
-      return 5
+      return 5;
     }
     // If just forming straight, return 5
     if (acc === 4 && current === true) {
       isStraight = true;
-      return 5 // We have it!
+      return 5; // We have it!
     }
     // If accumulator is in default/reset state, increase
     if (acc === 0 && current === true) {
-      return 1
+      return 1;
     }
     if (acc > 0 && current === true) {
-      return acc + 1
+      return acc + 1;
     }
     if (acc > 0 || current === false) {
-      return 0
+      return 0;
     }
-  }, 0)
+  }, 0);
 
-  return isStraight
-}
+  return isStraight;
+};
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -160,19 +160,24 @@ export class Player {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
-    
+
     const sameFourSuit = shouldRaiseBasedOnSuit(allCards, 4);
-    const flush = shouldRaiseBasedOnSuit(allCards, 5);
+    const hasFlush = shouldRaiseBasedOnSuit(allCards, 5);
     const allOccurrences = getAllOccurrences(allCards);
     const { pairs, triplets, quadruplets } = getPairs(allOccurrences);
     const hasPair = pairs.length === 1;
+    const hasTwoPairs = pairs.length === 2;
     // const hasTwoPairs = pairs.length === 2;
     const hasThreeOfAKind = triplets.length > 0;
     const hasFourOfAKind = quadruplets.length > 0;
     const hasFullHouse = hasThreeOfAKind && hasPair;
-    const hasStraight = getStraight(allOccurrences)
-    
+    const hasStraight = getStraight(allOccurrences);
+
     if (allCards.length === 5) {
+      if (hasStraight && hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 4));
+        return;
+      }
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 3));
         return;
@@ -182,12 +187,34 @@ export class Player {
         return;
       }
       if (sameFourSuit) {
-        betCallback(Math.ceil(callAmt + minRaise * 2.5));
+        betCallback(Math.ceil(callAmt + minRaise * 1.5));
+        return;
       }
-      if (flush) {
-        betCallback(Math.ceil(callAmt + minRaise * 4));
+      if (hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 2));
+        return;
+      }
+      if (hasStraight) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.5));
+        return;
+      }
+      if (hasLargeBet) {
+        betCallback(0);
+        return;
+      }
+      if (hasThreeOfAKind) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.25));
+        return;
+      }
+      if (hasTwoPairs) {
+        betCallback(Math.ceil(callAmt + minRaise * 1));
+        return;
       }
     } else if (allCards.length === 6) {
+      if (hasStraight && hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 4.5));
+        return;
+      }
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 3.5));
         return;
@@ -196,13 +223,57 @@ export class Player {
         betCallback(Math.ceil(callAmt + minRaise * 3));
         return;
       }
+      if (hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 2.5));
+        return;
+      }
+      if (hasStraight) {
+        betCallback(Math.ceil(callAmt + minRaise * 2));
+        return;
+      }
+      if (hasLargeBet) {
+        betCallback(0);
+        return;
+      }
+      if (hasThreeOfAKind) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.75));
+        return;
+      }
+      if (hasTwoPairs) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.25));
+        return;
+      }
     } else if (allCards.length === 7) {
+      if (hasStraight && hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 5));
+        return;
+      }
       if (hasFourOfAKind) {
         betCallback(Math.ceil(callAmt + minRaise * 4));
         return;
       }
       if (hasFullHouse) {
         betCallback(Math.ceil(callAmt + minRaise * 3.5));
+        return;
+      }
+      if (hasFlush) {
+        betCallback(Math.ceil(callAmt + minRaise * 3));
+        return;
+      }
+      if (hasStraight) {
+        betCallback(Math.ceil(callAmt + minRaise * 2.5));
+        return;
+      }
+      if (hasLargeBet) {
+        betCallback(0);
+        return;
+      }
+      if (hasThreeOfAKind) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.75));
+        return;
+      }
+      if (hasTwoPairs) {
+        betCallback(Math.ceil(callAmt + minRaise * 1.25));
         return;
       }
     }
