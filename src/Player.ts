@@ -78,18 +78,13 @@ const getAllOccurrences = (allCards) => {
   return occurrences;
 };
 
-const getPairs = (occurrences) => {
-  const pairs = []
-  const triplets = []
-  const quadruplets = []
-
+const getAllPairs = (occurrences) => {
+  const pairs = [];
   for (const [key, value] of Object.entries(occurrences)) {
-    if (value === 2) pairs.push(key)
-    if (value === 3) triplets.push(key)
-    if (value === 4) quadruplets.push(key)
+    if (value > 1) pairs.push(key);
   }
-  return { pairs, triplets, quadruplets }
-}
+  return pairs;
+};
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -105,17 +100,11 @@ export class Player {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
-    
-    const allCards = getAllCards(gameState)
-    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
-    const allOccurrences = getAllOccurrences(allCards)
-    const { pairs, triplets, quadruplets}  = getPairs(allOccurrences)
 
-    const hasPair = pairs.length === 1
-    const hasTwoPairs = pairs.length === 2
-    const hasThreeOfAKind = triplets.length > 0
-    const hasFourOfAKind = quadruplets.length > 0
-    const hasFullHouse = hasThreeOfAKind && hasPair
+    const allCards = getAllCards(gameState);
+    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
+    const allOccurrences = getAllOccurrences(allCards);
+    const allPairs = getAllPairs(allOccurrences);
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
