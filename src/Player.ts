@@ -52,14 +52,20 @@ const shouldRaiseBasedOnSuit = (allCards) => {
 const getAllOccurrences = (allCards) => {
   const allRanks = allCards.map(c => c.rank)
 
-  const occurrences = ranks.reduce((acc, r) => {
+  const occurrences: Record<string, number> = ranks.reduce((acc, r) => {
     return { ...acc, [r]: allRanks.filter(ar => ar === r).length }
   }, {})
 
   return occurrences
 }
 
-
+const getAllPairs = (occurrences) => {
+  const pairs = []
+  for (const [key, value] of Object.entries(occurrences)) {
+    if (value > 1) pairs.push(key)
+  }
+  return pairs
+}
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -73,6 +79,8 @@ export class Player {
 
     const allCards = getAllCards(gameState)
     const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
+    const allOccurrences = getAllOccurrences(allCards)
+    const allPairs = getAllPairs(allOccurrences)
 
     this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
