@@ -79,17 +79,17 @@ const getAllOccurrences = (allCards) => {
 };
 
 const getPairs = (occurrences) => {
-  const pairs = [];
-  const triplets = [];
-  const quadruplets = [];
+  const pairs = []
+  const triplets = []
+  const quadruplets = []
 
   for (const [key, value] of Object.entries(occurrences)) {
-    if (value === 2) pairs.push(key);
-    if (value === 3) triplets.push(key);
-    if (value === 4) quadruplets.push(key);
+    if (value === 2) pairs.push(key)
+    if (value === 3) triplets.push(key)
+    if (value === 4) quadruplets.push(key)
   }
-  return { pairs, triplets, quadruplets };
-};
+  return { pairs, triplets, quadruplets }
+}
 
 export class Player {
   public betRequest(gameState: Game, betCallback: (bet: number) => void): void {
@@ -100,54 +100,24 @@ export class Player {
     const callAmt = currentBuyin - currentBet;
     const minRaise = gameState.minimum_raise;
     const holeCards = gameState.players[playerIndex]["hole_cards"];
-    const currPot = gameState.pot;
 
     if (currentBet === 0) {
       this.betStarting(holeCards, callAmt, minRaise, betCallback);
       return;
     }
+    
+    const allCards = getAllCards(gameState)
+    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards)
+    const allOccurrences = getAllOccurrences(allCards)
+    const { pairs, triplets, quadruplets}  = getPairs(allOccurrences)
 
-    const allCards = getAllCards(gameState);
-    if (allCards.length === 2) {
-      this.betStarting(holeCards, callAmt, minRaise, betCallback);
-      return;
-    }
-    const raiseOnSuits = shouldRaiseBasedOnSuit(allCards);
-    const allOccurrences = getAllOccurrences(allCards);
-    const { pairs, triplets, quadruplets } = getPairs(allOccurrences);
-    const hasPair = pairs.length === 1;
-    const hasTwoPairs = pairs.length === 2;
-    const hasThreeOfAKind = triplets.length > 0;
-    const hasFourOfAKind = quadruplets.length > 0;
-    const hasFullHouse = hasThreeOfAKind && hasPair;
-    if (allCards.length === 5) {
-      if (hasFourOfAKind) {
-        betCallback(Math.ceil(callAmt + minRaise * 3));
-        return;
-      }
-      if (hasFullHouse) {
-        betCallback(Math.ceil(callAmt + minRaise * 2.5));
-      }
-    } else if (allCards.length === 6) {
-      if (hasFourOfAKind) {
-        betCallback(Math.ceil(callAmt + minRaise * 3.5));
-        return;
-      }
-      if (hasFullHouse) {
-        betCallback(Math.ceil(callAmt + minRaise * 3));
-        return;
-      }
-    } else if (allCards.length === 7) {
-      if (hasFourOfAKind) {
-        betCallback(Math.ceil(callAmt + minRaise * 4));
-      }
-      if (hasFullHouse) {
-        betCallback(Math.ceil(callAmt + minRaise * 3.5));
-        return;
-      }
-    }
+    const hasPair = pairs.length === 1
+    const hasTwoPairs = pairs.length === 2
+    const hasThreeOfAKind = triplets.length > 0
+    const hasFourOfAKind = quadruplets.length > 0
+    const hasFullHouse = hasThreeOfAKind && hasPair
 
-    // this.betStarting(holeCards, callAmt, minRaise, betCallback);
+    this.betStarting(holeCards, callAmt, minRaise, betCallback);
   }
 
   private betStarting(
