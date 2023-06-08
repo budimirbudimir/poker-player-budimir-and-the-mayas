@@ -92,18 +92,11 @@ const getPairs = (occurrences) => {
 };
 
 function detectLargeBet(players: GamePlayer[], playerIndex: number) {
-  let oppStack,
-    oppBet,
-    currBet = 0;
-  if (playerIndex === 0) {
-    oppStack = players[1].stack;
-    oppBet = players[1].bet;
-    currBet = players[0].bet;
-  } else {
-    oppStack = players[0].stack;
-    oppBet = players[0].bet;
-    currBet = players[1].bet;
-  }
+  const opponent = players.find((p) => p.name === "Monks on Meth");
+  const myPlayer = players.find((p) => p.name === "Budimir and The Mayas");
+  const oppBet = opponent.bet;
+  const currBet = myPlayer.bet;
+  const oppStack = opponent.stack;
   const betDiff = oppBet - currBet;
   const betRatio = oppBet / currBet;
   if (oppStack === 0 && betDiff > 200) {
